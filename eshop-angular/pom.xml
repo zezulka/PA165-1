@@ -85,7 +85,7 @@
         </dependency>
 
         <!-- must provide logging implementation, this is a runnable project -->
-        <!-- see viz http://docs.spring.io/platform/docs/1.1.4.RELEASE/reference/htmlsingle/#getting-started-logging -->
+        <!-- see viz http://docs.spring.io/platform/docs/current/reference/htmlsingle/#getting-started-logging -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
@@ -132,7 +132,7 @@
                     <path>/eshop</path>
                 </configuration>
             </plugin>
-            <!-- try "mavn javadoc:javadoc" and see target/site/apidocs -->
+            <!-- try "mvn javadoc:javadoc" and see target/site/apidocs -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -144,7 +144,7 @@
                         <link>http://docs.spring.io/spring/docs/current/javadoc-api/</link>
                         <link>http://docs.spring.io/spring-hateoas/docs/current/api/</link>
                         <link>http://fasterxml.github.io/jackson-annotations/javadoc/2.5/</link>
-                        <!--<link>http://docs.oracle.com/javase/8/docs/api/</link>-->
+                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
                     </links>
                 </configuration>
             </plugin>
