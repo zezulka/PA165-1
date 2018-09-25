@@ -18,6 +18,9 @@ public class CarShopStorageServiceImpl implements CarShopStorageService {
 	public Optional<Car> isCarAvailable(Color color, CarTypes type) {
 		Map<CarTypes, List<Car>> allCars = CarShopStorage.getInstancce().getCars();
 		List<Car> carsOfSameType = allCars.get(type);
+                if(carsOfSameType == null) {
+                   return Optional.empty();
+                }
 		return carsOfSameType.stream().filter(car -> car.getColor().equals(color)).findAny();
 	}
 
@@ -43,7 +46,8 @@ public class CarShopStorageServiceImpl implements CarShopStorageService {
                 if (!result.isPresent()) {
                     throw new RequestedCarNotFoundException(String.format("Car could not be found: %s", car));
                 }
-                CarShopStorage.getInstancce().getCars().get(car.getType()).remove(result.get());
+                Car cars = result.get();
+                CarShopStorage.getInstancce().getCars().get(car.getType()).remove(cars);
         }
 
 }

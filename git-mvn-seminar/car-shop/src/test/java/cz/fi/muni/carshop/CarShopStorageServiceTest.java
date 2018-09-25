@@ -2,8 +2,7 @@ package cz.fi.muni.carshop;
 
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.awt.Color;
 import java.util.List;
@@ -16,8 +15,10 @@ import org.junit.Rule;
 
 import cz.fi.muni.carshop.entities.Car;
 import cz.fi.muni.carshop.enums.CarTypes;
+import cz.fi.muni.carshop.exceptions.RequestedCarNotFoundException;
 import cz.fi.muni.carshop.services.CarShopStorageService;
 import cz.fi.muni.carshop.services.CarShopStorageServiceImpl;
+import org.junit.After;
 
 public class CarShopStorageServiceTest {
 
@@ -26,7 +27,12 @@ public class CarShopStorageServiceTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Test()
+        @After
+        public void cleanup() {
+            CarShopStorage.getInstancce().getCars().clear();
+        }
+        
+	@Test
 	public void testPriceCantBeNegative() {
 		// JUnit 4.11
 		//thrown.expect(IllegalArgumentException.class);
@@ -64,5 +70,20 @@ public class CarShopStorageServiceTest {
 				hasSize(3));
 
 	}
+        
+        @Test
+        public void testSellCar_existing() throws RequestedCarNotFoundException {
+                Car car = new Car(Color.BLACK, CarTypes.AUDI, 2016, 123456);
+                service.addCarToStorage(car);
+                service.sellCar(car);
+                Map<CarTypes, List<Car>> cars = CarShopStorage.getInstancce().getCars();
+                assertTrue(cars.get(car.getType()).isEmpty());
+        }
 
+        @Test
+        public void testSellCar_missing() throws RequestedCarNotFoundException {
+                thrown.reportMissingExceptionWithMessage("Car is missing and no exception was thrown when selling it.")
+                        .expect(RequestedCarNotFoundException.class);
+                service.sellCar(new Car(Color.BLACK, CarTypes.AUDI, 2016, 123456));
+        }
 }
