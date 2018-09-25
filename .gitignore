@@ -9,3 +9,4 @@ test-output
 *.jar
 *~
 target
+/git-mvn-seminar/car-shop/nbproject/
