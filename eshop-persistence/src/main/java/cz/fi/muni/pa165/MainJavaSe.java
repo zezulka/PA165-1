@@ -11,6 +11,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import cz.fi.muni.pa165.entity.Category;
 import cz.fi.muni.pa165.entity.Product;
+import cz.fi.muni.pa165.enums.Color;
+import java.util.Arrays;
+import java.util.Calendar;
+import javax.persistence.PersistenceException;
 
 public class MainJavaSe {
 	private static EntityManagerFactory emf;
@@ -22,7 +26,7 @@ public class MainJavaSe {
 		emf = Persistence.createEntityManagerFactory("default");
 		try {
 			// BEGIN YOUR CODE
-			task04();
+			task08();
 			// END YOUR CODE
 		} finally {
 			emf.close();
@@ -43,13 +47,18 @@ public class MainJavaSe {
 		List<Category> categories = em.createQuery(
 				"select c from Category c order by c.name", Category.class)
 				.getResultList();
-
+                Category musical = new Category();
+                musical.setName("Musical");
+                Category electronics = new Category();
+                electronics.setName("Electronics");
+                categories.addAll(Arrays.asList(electronics, musical));
                 if (categories.size() != 2) 
                     throw new RuntimeException("Expected two categories!");
 
 		assertEq(categories.get(0).getName(), "Electronics");
 		assertEq(categories.get(1).getName(), "Musical");
-
+                em.persist(musical);
+                em.persist(electronics);
 		em.getTransaction().commit();
 		em.close();
 
@@ -68,7 +77,14 @@ public class MainJavaSe {
 		// TODO under this line. create new EM and start new transaction. Merge
 		// the detached category
 		// into the context and change the name to "Electro"
-
+                em = emf.createEntityManager();
+                em.getTransaction().begin();
+                // The assignment here is critical!
+                category = em.merge(category);
+                category.setName("Electro");
+                em.persist(category);
+                em.getTransaction().commit();
+                em.close();
 
 		// The code below is just testing code. Do not modify it
 		EntityManager checkingEm = emf.createEntityManager();
@@ -94,19 +110,30 @@ public class MainJavaSe {
 		// Additional task: Change the underlying table of Product entity to be ESHOP_PRODUCTS. After you do this, check this by inspecting console output (the CREATE TABLE statement)
 		//
 		// To test your code uncomment the commented code at the end of this method.
+                EntityManager em = emf.createEntityManager();
+                em.getTransaction().begin();
+                Product prod = new Product();
+                prod.setName("Guitar");
+                prod.setColor(Color.BLACK);
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, 2011);
+                cal.set(Calendar.MONTH, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.DAY_OF_MONTH, 20);
+                prod.setAddedDate(cal.getTime());
+                em.persist(prod);
+                em.getTransaction().commit();
+                em.close();
 
-
-		EntityManager em = emf.createEntityManager();
+		em = emf.createEntityManager();
 		em.getTransaction().begin();
 		Product p = em.createQuery("select p from Product p", Product.class)
 				.getSingleResult();
 		em.getTransaction().commit();
 		em.close();
 
-	/** TODO Uncomment the following test code after you are finished!
-	 
 		assertEq(p.getName(), "Guitar");
-		Calendar cal = Calendar.getInstance();
+		cal = Calendar.getInstance();
 		cal.setTime(p.getAddedDate());
 		assertEq(cal.get(Calendar.YEAR), 2011);
 		assertEq(cal.get(Calendar.MONTH), 0);
@@ -137,7 +164,6 @@ public class MainJavaSe {
 	
 
 		System.out.println("Task6 ok!");
-		*/
 	}
 	
 	private static void task08() {
@@ -145,13 +171,6 @@ public class MainJavaSe {
 		//Implement business equivalence on Product (equals and hashcode method). Tip: Product.name is nonullable and should have unique values 
 		//This is very important concept and you should understand it beyond just "making this method work"
 		// see https://developer.jboss.org/wiki/EqualsandHashCode
-		
-		//TODO after you implement equals nad hashCode, you can uncomment the code below. It will try
-		// to check whether you are doing everything correctly. 
-	
-/* TODO uncomment the following (it should work if you were successfull with task08)
-
-
 		class MockProduct extends Product {
 			private boolean getNameCalled = false;
 			@Override
@@ -187,7 +206,6 @@ public class MainJavaSe {
 		if (mp.getNameCalled){
 			System.out.println("CORRECT");
 		} else System.out.println("INCORRECT!");
-		 */
 	
 	}
 
